@@ -1,0 +1,34 @@
+/* style.css */
+
+body{
+  font-family: sans-serif;
+  padding: 20px;
+}
+
+.todo-input{
+  width: 200px;
+  padding: 5px;
+}
+
+.add-btn{
+  padding: 5px 10px;
+}
+
+.todo-list{
+  margin-top: 20px;
+  padding: 0;
+}
+
+.todo-item{
+  list-style: none;
+  margin-bottom: 10px;
+}
+
+.completed{
+  text-decoration: line-through;
+  color: gray;
+}
+
+button{
+  margin-left: 5px;
+}
