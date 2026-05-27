@@ -1,97 +1,106 @@
-// script.js
+const input = document.querySelector(".todo-input");
+const button = document.querySelector(".add-btn");
+const list = document.querySelector(".todo-list");
 
-const todoInput = document.querySelector(".todo-input");
-const addBtn = document.querySelector(".add-btn");
-const todoList = document.querySelector(".todo-list");
+let todoArr = [];
 
-let todos = JSON.parse(localStorage.getItem("todos")) || [];
-
-renderTodo();
-
-addBtn.addEventListener("click", addTodo);
-
-todoInput.addEventListener("keydown", function(e){
-  if(e.key === "Enter"){
-    addTodo();
+if (localStorage.getItem("todos")) {
+  todoArr = JSON.parse(localStorage.getItem("todos"));
+}
+showTodo();
+button.addEventListener("click", function () {
+  addList();
+});
+input.addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    addList();
   }
 });
+function addList() {
+  let value = input.value.trim();
 
-function addTodo(){
-
-  const text = todoInput.value;
-
-  if(text === ""){
-    alert("입력하세요");
+  if (value === "") {
+    alert("할 일을 입력하세요");
     return;
   }
 
-  const todo = {
-    id: Date.now(),
-    text: text,
-    completed: false
+  let todo = {
+    text: value,
+    done: false,
+    id: new Date().getTime(),
   };
 
-  todos.push(todo);
-
-  saveTodo();
-  renderTodo();
-
-  todoInput.value = "";
+  todoArr.push(todo);
+  localStorage.setItem("todos", JSON.stringify(todoArr));
+  input.value = "";
+  showTodo();
 }
+function showTodo() {
+  list.innerHTML = "";
 
-function renderTodo(){
-
-  todoList.innerHTML = "";
-
-  todos.forEach(function(todo){
-
-    const li = document.createElement("li");
+  for (let i = 0; i < todoArr.length; i++) {
+    let li = document.createElement("li");
 
     li.classList.add("todo-item");
-
-    if(todo.completed){
+    if (todoArr[i].done === true) {
       li.classList.add("completed");
     }
 
     li.innerHTML = `
-      ${todo.text}
+      <span>${todoArr[i].text}</span>
 
-      <button class="complete-btn">
-        완료
-      </button>
+      <div class="btn-group">
+        <button class="check-btn">
+          ${todoArr[i].done ? "취소" : "완료"}
+        </button>
 
-      <button class="delete-btn">
-        삭제
-      </button>
+        <button class="edit-btn">수정</button>
+
+        <button class="remove-btn">삭제</button>
+      </div>
     `;
 
-    const completeBtn = li.querySelector(".complete-btn");
+    let checkBtn = li.querySelector(".check-btn");
+    checkBtn.addEventListener("click", function () {
+      todoArr[i].done = !todoArr[i].done;
 
-    completeBtn.addEventListener("click", function(){
+      localStorage.setItem("todos", JSON.stringify(todoArr));
 
-      todo.completed = !todo.completed;
-
-      saveTodo();
-      renderTodo();
+      showTodo();
     });
 
-    const deleteBtn = li.querySelector(".delete-btn");
+    let editBtn = li.querySelector(".edit-btn");
 
-    deleteBtn.addEventListener("click", function(){
+    editBtn.addEventListener("click", function () {
+      let newText = prompt(
+        "수정할 내용을 입력하세요",
+        todoArr[i].text
+      );
+      if (newText === null) {
+        return;
+      }
+      newText = newText.trim();
 
-      todos = todos.filter(function(item){
-        return item.id !== todo.id;
-      });
+      if (newText === "") {
+        alert("내용을 입력하세요");
+        return;
+      }
 
-      saveTodo();
-      renderTodo();
+      todoArr[i].text = newText;
+
+      localStorage.setItem("todos", JSON.stringify(todoArr));
+
+      showTodo();
     });
+    let removeBtn = li.querySelector(".remove-btn");
 
-    todoList.appendChild(li);
+    removeBtn.addEventListener("click", function () {
+      todoArr.splice(i, 1);
 
-  });
-}
+      localStorage.setItem("todos", JSON.stringify(todoArr));
 
-function saveTodo(){
-  localStorage.setItem("todos", JSON.stringify(todos));
+      showTodo();
+    });
+    list.appendChild(li);
+  }
 }
